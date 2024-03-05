@@ -6,17 +6,11 @@
 #include <cryptoTools/Crypto/AES.h>
 #include "../../secure-indices/core/DCFTable.h"
 #include "../../secure-indices/core/DPFTable.h"
-#include "../../secure-indices/core/AggTree.h"
 #include "../../network/core/query.grpc.pb.h"
 #include "../../network/core/query.pb.h"
-#include "../../secure-indices/core/common.h"
 #include "../../utils/json.hpp"
 #include "../../utils/config.h"
-#include "../../utils/dorydbconfig.h"
 #include "server.h"
-#include "network-emp/core/io_channel.h"
-#include "network-emp/core/net_io_channel.h"
-#include "network-emp/core/highspeed_net_io_channel.h"
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -103,19 +97,6 @@ void QueryServer::StartSystemInit(string addrs[]) {
     int psn = next_server_addr.find(":");
     next_server_addr = next_server_addr.substr(0, psn);
 
-    if(serverID == 0){
-        cout << "setting up EMP connection as client on address, port " << next_server_addr << " " << (emp_port + serverID) << endl;
-        emp_io_upstream = new NetIO(next_server_addr.c_str(), emp_port + serverID);
-        cout << "setting up EMP connection as server on address, port " << "0.0.0.0" << " " << (emp_port + (2 % NUM_SERVERS)) << endl;
-        emp_io_downstream = new NetIO(nullptr, emp_port + (2 % NUM_SERVERS));
-    }
-    else{
-        cout << "setting up EMP connection as server on address, port " << "0.0.0.0" << " " << (emp_port + ((serverID - 1) % NUM_SERVERS)) << endl;
-        emp_io_downstream = new NetIO(nullptr, emp_port + ((serverID - 1) % NUM_SERVERS));
-        cout << "setting up EMP connection as client on address, port " << next_server_addr << " " << (emp_port + serverID) << endl;
-        emp_io_upstream = new NetIO(next_server_addr.c_str(), emp_port + serverID);
-    }
-
     cout << "connected EMP NetIO to " << next_server_addr << endl;
 
     InitSystemRequest req;
@@ -184,17 +165,6 @@ void QueryServer::ValListUpdate(string id, uint32_t loc, uint128_t val0, uint128
     ValLists[id].second[loc] = val1;
 }
 
-uint128_t **QueryServer::AggTreeAppend1(string id, int *len) {
-    uint128_t **pathShares = (uint128_t **)malloc(2 * sizeof(uint128_t *));
-    pathShares[0] = AggTrees[id].first->getAppendPath(len);
-    pathShares[1] = AggTrees[id].second->getAppendPath(len);
-    return pathShares;
-}
-
-void QueryServer::AggTreeAppend2(string id, uint32_t idx, uint128_t *new_shares0, uint128_t *new_shares1) {
-    AggTrees[id].first->finishAppend(idx, new_shares0);
-    AggTrees[id].second->finishAppend(idx, new_shares1);
-}
 
 void QueryServer::DCFQuery(uint128_t **res0, uint128_t **res1, string id, const uint8_t *key0, const uint8_t *key1, uint32_t *len) {
     uint64_t gout_bitsize = 125;
@@ -313,25 +283,6 @@ void QueryServer::RSSReshare(uint128_t **res0, uint128_t **res1, uint32_t numSet
         memcpy(res0[i], ((uint8_t *)multReceivedShares) + (i * len * sizeof(uint128_t)), len * sizeof(uint128_t));
     }
     free(multReceivedShares);
-#else
-    // Using EMP NetIO
-    cout << "Sending Mult data via EMP " << (numSets * sizeof(uint128_t) * len) << "bytes" << endl;
-    uint128_t* multRcvdShares = (uint128_t*)malloc(numSets * sizeof(uint128_t) * len);
-    //thread workers[2];
-    if(serverID == 0){
-        emp_io_downstream->recv_data(multRcvdShares, numSets * sizeof(uint128_t) * len);
-        emp_io_upstream->send_data(sendShares, numSets * sizeof(uint128_t) * len);
-    }
-    else{
-        emp_io_upstream->send_data(sendShares, numSets * sizeof(uint128_t) * len);
-        emp_io_downstream->recv_data(multRcvdShares, numSets * sizeof(uint128_t) * len);
-    }
-    cout << "Done EMP part" << endl;
-
-    for (int i = 0; i < numSets; i++) {
-        memcpy(res0[i], ((uint8_t *)multRcvdShares) + (i * len * sizeof(uint128_t)), len * sizeof(uint128_t));
-    }
-    delete[] multRcvdShares;
 #endif
     multReceivedShares = NULL;
     orderCV.notify_one();
@@ -363,7 +314,7 @@ void QueryServer::AddToBatchMACCheck(uint128_t** x0, uint128_t** x1, uint128_t* 
     }
 }
 
-void QueryServer::AggTreeQuery(string id, const uint8_t *key0, const uint8_t *key1, uint128_t *ret, uint128_t *mac, uint128_t *ret_r, uint128_t *mac_r, int* dd) {
+void QueryServer::Query(string id, const uint8_t *key0, const uint8_t *key1, uint128_t *ret, uint128_t *mac, uint128_t *ret_r, uint128_t *mac_r, int* dd) {
     uint64_t gout_bitsize = 125;
     // *ret = 0;
     // *mac = 0;
@@ -830,20 +781,7 @@ public:
         return Status::OK;
     }
 
-
-
-    Status SendATAppend2(ServerContext *context, const AppendAT2Request *req, AppendAT2Response *resp) override {
-        printf("Processing AggTree append part 2\n");
-        uint128_t *new_shares0 = (uint128_t *)malloc(req->new_shares0_size() * sizeof(uint128_t));
-        uint128_t *new_shares1 = (uint128_t *)malloc(req->new_shares1_size() * sizeof(uint128_t));
-        for (int i = 0; i < req->new_shares0_size(); i++) {
-            memcpy((uint8_t *)&new_shares0[i], req->new_shares0(i).c_str(), sizeof(uint128_t));
-            memcpy((uint8_t *)&new_shares1[i], req->new_shares1(i).c_str(), sizeof(uint128_t));
-        }
-        server.AggTreeAppend2(req->id(), req->idx(), new_shares0, new_shares1);
-        printf("Finished processing AggTree append part 2\n");
-        return Status::OK;
-    }
+    
 
     Status SendDCFQuery(ServerContext *context, const QueryDCFRequest *req, QueryDCFResponse *resp) override {
         uint32_t len = 0;
