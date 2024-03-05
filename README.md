@@ -16,7 +16,7 @@ Note that the [libPSI](https://github.com/osu-crypto/libPSI) and [libOTe](https:
 
 ## Building
 
-This project requires an NVIDIA GPU, and assumes you have your GPU drivers and the [NVIDIA CUDA Toolkit](https://docs.nvidia.com/cuda/) already installed. The following has been tested with the `Deep Learning Base AMI (Ubuntu 18.04 ) Version 53.5` AMI.
+This project requires an NVIDIA GPU, and assumes you have your GPU drivers and the [NVIDIA CUDA Toolkit](https://docs.nvidia.com/cuda/) already installed. The following has been tested with the `Deep Learning Base AMI (Ubuntu 20.04.3) Version 53.5` AMI.
 
 Checkout external modules
 ```
