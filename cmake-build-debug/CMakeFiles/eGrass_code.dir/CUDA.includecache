@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/tmp/tmp.SJ7XAw9wff/main.cu
+iostream
+-
+typeDef.h
+/tmp/tmp.SJ7XAw9wff/typeDef.h
+

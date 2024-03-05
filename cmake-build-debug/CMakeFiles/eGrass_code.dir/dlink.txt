@@ -1,0 +1,1 @@
+/usr/local/cuda-11.4/bin/nvcc  -g -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink CMakeFiles/eGrass_code.dir/main.cu.o -o CMakeFiles/eGrass_code.dir/cmake_device_link.o 
