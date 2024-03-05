@@ -991,14 +991,6 @@ int Process_Parall() {
         std::cout << std::endl;
     }
 
-    // 释放内存
-    free(a);
-    free(b);
-    free(c);
-    cudaFree(d_a);
-    cudaFree(d_b);
-    cudaFree(d_c);
-
     return 0;
 }
 
