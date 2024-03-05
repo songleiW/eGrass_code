@@ -32,13 +32,13 @@ make -j
 
 Build libOTe 
 ```
-cd fss-core/libOTe
+cd PredEval/libOTe
 cmake . -DENABLE_RELIC=ON -DENABLE_NP=ON -DENABLE_KKRT=ON
 make -j
 ```
 Build libPSI
 ```
-cd fss-core/libPSI
+cd PredEval/libPSI
 cmake . -DENABLE_RELIC=ON -DENABLE_DRRN_PSI=ON -DENABLE_KKRT_PSI=ON
 make -j
 ```
