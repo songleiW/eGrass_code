@@ -51,10 +51,6 @@ make
 cd ..
 ```
 
-cmake .
-make
-```
-
 ## Testing locally
 
 To run the entire system locally, start server X as `./build/bin/query_server config/serverX.config`. Start the client with `./build/bin/bench config/client.config`.
