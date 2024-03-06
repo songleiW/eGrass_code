@@ -16,7 +16,7 @@ Note that the [libPSI](https://github.com/osu-crypto/libPSI) and [libOTe](https:
 
 ## Building
 
-This project requires an NVIDIA GPU, and assumes you have your GPU drivers and the [NVIDIA CUDA Toolkit](https://docs.nvidia.com/cuda/) already installed. The following has been tested with the `Deep Learning Base AMI (Ubuntu 18.04 ) Version 53.5` AMI.
+This project requires an NVIDIA GPU, and assumes you have your GPU drivers and the [NVIDIA CUDA Toolkit](https://docs.nvidia.com/cuda/) already installed. The following has been tested with the `Deep Learning Base AMI (Ubuntu 20.04.3) Version 53.5` AMI.
 
 Checkout external modules
 ```
@@ -53,12 +53,8 @@ cd ..
 
 ## Testing locally
 
-To run the entire system locally, start server X as `./build/bin/query_server config/serverX.config`. Start the client with `./build/bin/bench config/client.config`.
-Alternatively, start the client with `./build/bin/correctness_tests` to run the correctness tests. Modify the parameters in the corresponding config files to run with different settings (e.g. number of cores, malicious security).
-Make sure to start the servers within 10 seconds of each other and wait until each has printed "DONE WITH SETUP" before starting the client (this means initialization has completed).
+To run the entire system locally, start server X as `./build/bin/query_server config/serverX.config`. Start the client with `./build/bin/bench config/client.config`. Alternatively, start the client with `./build/bin/correctness_tests` to run the correctness tests. Modify the parameters in the corresponding config files to run with different settings (e.g. number of cores, malicious security). Make sure to start the servers within 10 seconds of each other and wait until each has printed "DONE WITH SETUP" before starting the client (this means initialization has completed).
 
 ## Limitations
 
-The rollup functionality suggested as an extension for the construction in the
-paper is not fully implemented. Also, the node values  are directly
-returned without aggregating by the user-defined aggregation function.
+The rollup functionality suggested as an extension for the construction in the paper is not fully implemented. Also, the node values  are directly returned without aggregating by the user-defined aggregation function.
