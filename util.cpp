@@ -7,16 +7,9 @@
 #include "../../secure-indices/core/DCFTable.h"
 #include "../../secure-indices/core/DPFTable.h"
 #include "../../secure-indices/core/AggTree.h"
-#include "../../network/core/query.grpc.pb.h"
-#include "../../network/core/query.pb.h"
-#include "../../secure-indices/core/common.h"
-#include "../../utils/json.hpp"
-#include "../../utils/config.h"
-#include "../../utils/dorydbconfig.h"
-#include "server.h"
-#include "network-emp/core/io_channel.h"
-#include "network-emp/core/net_io_channel.h"
-#include "network-emp/core/highspeed_net_io_channel.h"
+#include "util.h"
+#include "SecureShuffle.h"
+#include "encGraph.h"
 
 using grpc::Server;
 using grpc::ServerBuilder;

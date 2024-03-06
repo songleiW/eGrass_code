@@ -1,16 +1,4 @@
 /usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CUDA_COMPILER:PATH=/usr/local/cuda-11.4/bin/nvcc -G "CodeBlocks - Unix Makefiles" -S /tmp/tmp.SJ7XAw9wff -B /tmp/tmp.SJ7XAw9wff/cmake-build-debug
 -- Configuring done
-CMake Error at CMakeLists.txt:6 (add_executable):
-  Cannot find source file:
-
-    cmake-build-debug/fileIO.cpp
-
-  Tried extensions .c .C .c++ .cc .cpp .cxx .cu .m .M .mm .h .hh .h++ .hm
-  .hpp .hxx .in .txx
-
-
-CMake Error at CMakeLists.txt:6 (add_executable):
-  No SOURCES given to target: eGrass_code
-
-
-CMake Generate step failed.  Build files cannot be regenerated correctly.
+-- Generating done
+-- Build files have been written to: /tmp/tmp.SJ7XAw9wff/cmake-build-debug

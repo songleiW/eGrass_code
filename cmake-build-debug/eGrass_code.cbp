@@ -66,7 +66,40 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/tmp/tmp.SJ7XAw9wff/PredEval/DCF-source/DCFClient.cpp">
+			<Option target="eGrass_code"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.SJ7XAw9wff/PredEval/DCF-source/DCFServer.cpp">
+			<Option target="eGrass_code"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.SJ7XAw9wff/correctness_tests.cpp">
+			<Option target="eGrass_code"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.SJ7XAw9wff/encGraph.cpp">
+			<Option target="eGrass_code"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.SJ7XAw9wff/encGraph.h">
+			<Option target="eGrass_code"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.SJ7XAw9wff/fileIO.cpp">
+			<Option target="eGrass_code"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.SJ7XAw9wff/fileIO.h">
+			<Option target="eGrass_code"/>
+		</Unit>
 		<Unit filename="/tmp/tmp.SJ7XAw9wff/main.cu">
+			<Option target="eGrass_code"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.SJ7XAw9wff/util.cpp">
+			<Option target="eGrass_code"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.SJ7XAw9wff/util.h">
+			<Option target="eGrass_code"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.SJ7XAw9wff/vecMul.cpp">
+			<Option target="eGrass_code"/>
+		</Unit>
+		<Unit filename="/tmp/tmp.SJ7XAw9wff/vecMul.h">
 			<Option target="eGrass_code"/>
 		</Unit>
 		<Unit filename="/tmp/tmp.SJ7XAw9wff/CMakeLists.txt">

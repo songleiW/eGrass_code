@@ -6,11 +6,10 @@
 #include <cryptoTools/Crypto/AES.h>
 #include "../../secure-indices/core/DCFTable.h"
 #include "../../secure-indices/core/DPFTable.h"
-#include "../../network/core/query.grpc.pb.h"
-#include "../../network/core/query.pb.h"
-#include "../../utils/json.hpp"
-#include "../../utils/config.h"
-#include "server.h"
+#include "util.h"
+#include "SecureShuffle.h"
+#include "encGraph.h"
+#include "fileIO.h"
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -722,66 +721,6 @@ public:
         printf("Added value list\n");
         return Status::OK;
     }
-
-    Status SendDCFBatchedUpdate(ServerContext *context, const BatchedUpdateDCFRequest *req, BatchedUpdateDCFResponse *resp) override {
-        for (int i = 0; i < req->updates_size(); i++) {
-            server.DCFUpdate(req->updates(i).id(), req->updates(i).val(), (const uint128_t *)req->updates(i).data0().c_str(), (const uint128_t *)req->updates(i).data1().c_str());
-        }
-        return Status::OK;
-    }
-
-    Status SendDCFUpdate(ServerContext *context, const UpdateDCFRequest *req, UpdateDCFResponse *resp) override {
-        //printf("Processing DCF update\n");
-        server.DCFUpdate(req->id(), req->val(), (const uint128_t *)req->data0().c_str(), (const uint128_t *)req->data1().c_str());
-        //printf("Finished processing DCF update\n");
-        return Status::OK;
-    }
-
-    Status SendDPFBatchedUpdate(ServerContext *context, const BatchedUpdateDPFRequest *req, BatchedUpdateDPFResponse *resp) override {
-        for (int i = 0; i < req->updates_size(); i++) {
-            server.DPFUpdate(req->updates(i).id(), req->updates(i).val(), (const uint128_t *)req->updates(i).data0().c_str(), (const uint128_t *)req->updates(i).data1().c_str());
-        }
-        return Status::OK;
-    }
-
-    Status SendDPFUpdate(ServerContext *context, const UpdateDPFRequest *req, UpdateDPFResponse *resp) override {
-        server.DPFUpdate(req->id(), req->val(), (const uint128_t *)req->data0().c_str(), (const uint128_t *)req->data1().c_str());
-        return Status::OK;
-    }
-
-    Status SendATAppend1(ServerContext *context, const AppendAT1Request *req, AppendAT1Response *resp) override {
-        int len;
-        printf("Processing AggTree append part 1\n");
-        uint128_t **parents = server.AggTreeAppend1(req->id(), &len);
-        for (int i = 0; i < len; i++) {
-            resp->add_parent_shares0((uint8_t *)&parents[0][i], sizeof(uint128_t));
-            resp->add_parent_shares1((uint8_t *)&parents[1][i], sizeof(uint128_t));
-        }
-        free(parents);
-        printf("Finished processing AggTree append part 1\n");
-        return Status::OK;
-    }
-
-    Status SendListBatchedUpdate(ServerContext *context, const BatchedUpdateListRequest *req, BatchedUpdateListResponse *resp) override {
-        for (int i = 0; i < req->updates_size(); i++) {
-            uint128_t val0, val1;
-            memcpy((uint8_t *)&val0, req->updates(i).share0().c_str(), sizeof(uint128_t));
-            memcpy((uint8_t *)&val1, req->updates(i).share1().c_str(), sizeof(uint128_t));
-            server.ValListUpdate(req->updates(i).id(), req->updates(i).val(), val0, val1);
-        }
-        return Status::OK;
-    }
-
-
-    Status SendListUpdate(ServerContext *context, const UpdateListRequest *req, UpdateListResponse *resp) override {
-        uint128_t val0, val1;
-        memcpy((uint8_t *)&val0, req->share0().c_str(), sizeof(uint128_t));
-        memcpy((uint8_t *)&val1, req->share1().c_str(), sizeof(uint128_t));
-        server.ValListUpdate(req->id(), req->val(), val0, val1);
-        return Status::OK;
-    }
-
-    
 
     Status SendDCFQuery(ServerContext *context, const QueryDCFRequest *req, QueryDCFResponse *resp) override {
         uint32_t len = 0;
