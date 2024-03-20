@@ -695,43 +695,33 @@ public:
     QueryServiceImpl(QueryServer &server) : server(server) {}
 
     Status SendDCFInit(ServerContext *context, const InitDCFRequest *req, InitDCFResponse *resp) override {
-        printf("Adding DCF table\n");
         server.DCFAddTable(req->id(), req->window_size(), req->num_buckets(), server.malicious);
-        printf("Added DCF table\n");
         return Status::OK;
     }
 
     Status SendDPFInit(ServerContext *context, const InitDPFRequest *req, InitDPFResponse *resp) override {
-        printf("Adding DPF table\n");
         server.DPFAddTable(req->id(), req->window_size(), req->num_buckets(), server.malicious);
-        printf("Added DPF table\n");
         return Status::OK;
     }
 
     Status SendATInit(ServerContext *context, const InitATRequest *req, InitATResponse *resp) override {
-        printf("Adding aggregate tree\n");
         server.AggTreeAddIndex(req->id(), req->depth(), (AggFunc)req->agg_func());
-        printf("Added aggregate tree\n");
         return Status::OK;
     }
 
     Status SendListInit(ServerContext *context, const InitListRequest *req, InitListResponse *resp) override {
-        printf("Adding value list\n");
         server.AddValList(req->id(), req->window_size());
-        printf("Added value list\n");
         return Status::OK;
     }
 
     Status SendDCFQuery(ServerContext *context, const QueryDCFRequest *req, QueryDCFResponse *resp) override {
         uint32_t len = 0;
-        printf("Received DCF query\n");
         uint128_t *res0;
         uint128_t *res1;
         server.DCFQuery(&res0, &res1, req->id(), (const uint8_t *)req->key0().c_str(), (const uint8_t *)req->key1().c_str(), &len);
         for (int i = 0; i < len; i++) {
             res0[i] += res1[i];
         }
-        printf("Finished processing DCF query\n");
         resp->set_res(res0, sizeof(uint128_t) * len);
         free(res0);
         free(res1);
@@ -887,6 +877,4 @@ int main(int argc, char *argv[]) {
     int server_num = config[SERVER_NUM];
     assert(server_num == 0 || server_num == 1 || server_num == 2);
     runServer(addrs, bindAddr, server_num, config[CORES], config[MALICIOUS]);
-
-
 }

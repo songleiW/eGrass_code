@@ -39,13 +39,10 @@ bool dpfAggTest(QueryClient *client, int numConds) {
     client->AddDPFTable(string("test_dpf"), windowSize, numBuckets, dcfVals);
 
     uint128_t agg = client->AggQuery(q.agg_table_id, q);
-    cout << "Aggregate retrieved: " << agg << endl;
 
     if (agg == numBuckets) {
-        cout << GREEN << "Returned correct DPF filter aggregate result " << agg << RESET << endl;
         return true;
     }
-    cout << RED << "ERROR: returned wrong DPF filter aggregate result " << agg << RESET << endl;
     return false;
 }
 
@@ -83,10 +80,8 @@ bool dcfAggTest(QueryClient *client, int numConds) {
     cout << "Aggregate retrieved: " << agg << endl;
 
     if (agg == 3) {
-        cout << GREEN << "Returned correct DCF filter aggregate result " << agg << RESET << endl;
         return true;
     }
-    cout << RED << "ERROR: returned wrong DCF filter aggregate result " << agg << RESET << endl;
     return false;
 }
 
@@ -94,9 +89,7 @@ bool aggTreeTest(QueryClient *client) {
     map<uint64_t, uint128_t> aggTreeData;
     int depth = 8;
     int left_x = 8;
-    //int left_x = 8;
     int right_x = 8;
-    //int right_x = 2;
     string table_id = "test_aggtree";
     for (uint64_t i = 1; i < (1 << (depth - 1)); i++) {
         uint128_t one = 1;
@@ -104,7 +97,6 @@ bool aggTreeTest(QueryClient *client) {
     }
 
     client->AddAggTree(table_id, sum, depth, aggTreeData);
-    cout << "Created aggregate tree\n" << endl;
     uint128_t *ret;
     uint128_t *ret_r;
     client->AggTreeQuery(table_id, left_x, right_x, &ret, &ret_r);
@@ -122,7 +114,6 @@ bool dcfTableTest(QueryClient *client) {
         data.push_back(rand() % numBuckets);
     }
     client->AddDCFTable(table_id, windowSize, numBuckets, data);
-    printf("Created DCF table\n");
     uint128_t *ret = client->DCFQuery(table_id, left_x, right_x, mac_factor * windowSize);
     uint128_t *ret_r = ret + (mac_factor)*windowSize;
     uint128_t alpha = client->GetMACAlpha();
@@ -131,23 +122,19 @@ bool dcfTableTest(QueryClient *client) {
     for (int i = 0; i < windowSize; i++) {
         if ((data[i] >= left_x || data[i] <= right_x) && ret[i] == 1) {
             correct = false;
-            cout << "ERROR: record " << i << " with value " << data[i] << " returned out of bounds from " << right_x << ", " << left_x << RESET << endl;
         } else if ((data[i] < left_x && data[i] > right_x) && ret[i] != 1) {
             correct = false;
-            cout << "ERROR: record " << i << " with value " << data[i] << " not returned when in the bounds " << right_x << ", " << left_x << RESET << endl;
         }
     }
     if(malicious){
         for (int i = 0; i < windowSize; i++){
             if (ret[i + windowSize] != (alpha * ret[i])){
                 correct = false;
-                cout << "ERROR MAC: MAC tag incorrect at record " << i << " with MAC tag " << ret[i + windowSize] << " vs expected " << (alpha * ret[i]) << RESET << endl;
             }
         }
     }
 
     if (correct) {
-        cout << GREEN << "Returned correct result for DCF table" << RESET << endl;
     }
 
     return correct;
@@ -156,7 +143,6 @@ bool dcfTableTest(QueryClient *client) {
 
 int main(int argc, char *argv[]) {
     string mal_on = (malicious) ? "ON" : "OFF";
-    cout<<"Malicious security with "<<RED<<STAT_SEC<<RESET<<" bit statistical security: "<<RED<<mal_on<<RESET<<endl;
     string addrs[3] = { "127.0.0.1:12345", "127.0.0.1:12346", "127.0.0.1:12347" };
     vector<shared_ptr<grpc::Channel>> channels;
     for (int i = 0; i < NUM_SERVERS; i++) {
@@ -171,13 +157,5 @@ int main(int argc, char *argv[]) {
     correct = correct && dpfAggTest(client, 5);
     correct = correct && dcfAggTest(client, 1);
     correct = correct && dcfAggTest(client, 5);
-
-
-    if (correct) {
-        cout << GREEN << "------ PASSED ALL TESTS ------ " << RESET << endl;
-    } else {
-        cout << RED << " ------ FAILING TESTS ------ " << RESET << endl;
-    }
-
 
 }
